@@ -11,6 +11,8 @@ String usersToJson(List<Users> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Users {
+  bool isExpanded = false;
+
   Users({
     required this.id,
     required this.name,

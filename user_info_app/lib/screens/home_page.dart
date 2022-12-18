@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:user_info_app/model/users.dart';
+import 'package:user_info_app/screens/profile.dart';
 import 'package:user_info_app/services/users_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   List<Users> _foundUsers = [];
 
   List<Users> _allUsers = [];
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   //filter function
-  void _runUserFilter(String value) {
+  void _runUserFilter(String value) async {
     if (value.isEmpty) {
       _foundUsers = _allUsers;
     } else {
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('UserAapp'),
+          title: const Text('UserApp'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(
@@ -68,8 +69,8 @@ class _HomePageState extends State<HomePage> {
                 key: _formKey,
                 child: TextFormField(
                   controller: searchController,
-                  onChanged: (valueKey) {
-                    _runUserFilter(valueKey);
+                  onChanged: (enteredValue) {
+                    _runUserFilter(enteredValue);
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -120,14 +121,86 @@ class _HomePageState extends State<HomePage> {
               ),
 
               Expanded(
-                  child: ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: _foundUsers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Center(
-                          child: Text(_foundUsers[index].name),
-                        );
-                      })),
+                child: _foundUsers.isNotEmpty
+                    ? ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: _foundUsers.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                            child: ListTile(
+                                title: Text(_foundUsers[index].name),
+                                subtitle: Text(_foundUsers[index].email),
+                                trailing: Image.asset(
+                                  'images/view_profile.png',
+                                  color: Colors.green,
+                                ),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: ((context) => ProfilePage(
+                                            website: _foundUsers[index].website,
+                                            phone: _foundUsers[index].phone,
+                                            name: _foundUsers[index].name,
+                                            city:
+                                                _foundUsers[index].address.city,
+                                            street: _foundUsers[index]
+                                                .address
+                                                .street,
+                                            companyName:
+                                                _foundUsers[index].company.name,
+                                            motto: _foundUsers[index]
+                                                .company
+                                                .catchPhrase,
+                                            userName:
+                                                _foundUsers[index].username,
+                                            email: _foundUsers[index].email,
+                                          )),
+                                    ),
+                                  );
+                                }),
+                          );
+                        })
+                    : const Text(
+                        'No results found',
+                        style: TextStyle(fontSize: 24),
+                      ),
+              ),
+
+              // Expanded(
+              //   child: ListView(
+              //     children: [
+              //       ExpansionPanelList(
+              //         expansionCallback: (int index, bool isExpanded) {
+              //           setState(
+              //             () {
+              //               _foundUsers[index].isExpanded =
+              //                   !_foundUsers[index].isExpanded;
+              //             },
+              //           );
+              //         },
+              //         children: _foundUsers.map<ExpansionPanel>(
+              //           (Users users) {
+              //             return ExpansionPanel(
+              //               headerBuilder:
+              //                   (BuildContext context, bool isExpaneded) {
+              //                 return ListTile(
+              //                   title: Text(users.name),
+              //                 );
+              //               },
+              //               body: ListTile(
+              //                   title: Text("haha"),
+              //                   subtitle: const Text(
+              //                       'To delete this panel, tap the trash can icon'),
+              //                   onTap: () {}),
+              //               isExpanded: users.isExpanded,
+              //             );
+              //           },
+              //         ).toList(),
+              //       ),
+              //     ],
+              //   ),
+              // )
             ],
           ),
         ),
